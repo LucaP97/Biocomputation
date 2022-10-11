@@ -110,7 +110,7 @@ for i in range( 0, P ):
         newind.gene.append(gene)
     # overwrite offspring with the new mutated version
     offspring[i] = copy.deepcopy(newind)
-#append new individual or overwrite offspring
+#append new individual or overwrite offspring.
 
 print("------------ fitness after mutation ------------")
 
