@@ -6,16 +6,29 @@ class individual:
         self.gene = [0]*N
         self.fitness = 0
 
+
+# --------------------------------------------------------------------------------
+# -------------------- global variables / lists ----------------------------------
+# --------------------------------------------------------------------------------
+
+
 # N is a gene, P is population
 N = 10
 P = 50
+G = 50
 
 # array that contains the population
 population = []
 offspring = []
 
 # probability for mutation
-MUTRATE = 0.1
+MUTRATE = 0.5
+
+
+# --------------------------------------------------------------------------------
+# -------------------- initialise initial population ----------------------------------
+# --------------------------------------------------------------------------------
+
 
 # fills the population full of nodes
 for x in range (0, P):
@@ -26,12 +39,22 @@ for x in range (0, P):
     newind.gene = tempgene.copy()
     population.append(newind)
 
+
+
+# --------------------------------------------------------------------------------
+# -------------------------- Functions ----------------------------------------
+# --------------------------------------------------------------------------------
+
+
+# -------------------------- Fitness ----------------------------------------
+
 # fitness function
 def test_function( ind ):
     utility=0
     for i in range(N):
         utility = utility + ind.gene[i]
     return utility
+
 
 # assigning fitness value to nodes in population
 def assignFitness(checkPop):
@@ -46,9 +69,80 @@ def printFitness(checkPop):
         #print(i.fitness)
     print("Sum of fitness: " + str(count))
 
+# -------------------------- Creating new generation ----------------------------------------
+
+# reusable function 
+def newGeneration(popSize, population):
+    for i in range (0, popSize):
+        parent1 = random.randint( 0, popSize-1 )
+        off1 = copy.deepcopy(population[parent1])
+        parent2 = random.randint( 0, popSize-1 )
+        off2 = copy.deepcopy(population[parent2])
+        # two offspring is created, best of the two is added to array
+        if off1.fitness > off2.fitness:
+            #offspring.append( off1 )
+            population[i] = off1
+        else:
+            #offspring.append( off2 )
+            population[i] = off1
+    return population
+
+# -------------------------- Crossover ----------------------------------------
+
+# pop size => P, genes => N
+def crossover(popSize, genes, population):
+    # Crossover (switching the tails)
+    toff1 = individual()
+    toff2 = individual()
+    temp = individual()
+    # looping through population, incrementing by 2 as we are working in pairs
+    for i in range( 0, popSize, 2 ):
+        toff1 = copy.deepcopy(population[i])
+        toff2 = copy.deepcopy(population[i+1])
+        temp = copy.deepcopy(population[i])
+        # deciding the crosspoint
+        crosspoint = random.randint(1,genes)
+        # looping through every gene in node to swap
+        for j in range (crosspoint, genes):
+            toff1.gene[j] = toff2.gene[j]
+            toff2.gene[j] = temp.gene[j]
+        # assinging the offspring to the new values
+        population[i] = copy.deepcopy(toff1)
+        population[i+1] = copy.deepcopy(toff2)
+    return population
+
+
+
+# -------------------------- Mutation ----------------------------------------
+
+
+def mutation(popSize, geneNum, population):
+    # loop through entire population
+    for i in range( 0, popSize ):
+        newind = individual()
+        newind.gene = []
+        # loop through every gene per node
+        for j in range( 0, geneNum ):
+            gene = population[i].gene[j]
+            mutprob = random.random()
+            # MUTRATE needs to be defined, as mutprob is variable
+            if mutprob < MUTRATE:
+                if( gene == 1):
+                    gene = 0
+                else:
+                    gene = 1
+            newind.gene.append(gene)
+        # overwrite offspring with the new mutated version
+        population[i] = copy.deepcopy(newind)
+        #append new individual or overwrite offspring.
+    return population
+
+
+
 assignFitness(population)
 
 printFitness(population)
+
 
 # selects parents and create offspring
 for i in range (0, P):
@@ -61,6 +155,7 @@ for i in range (0, P):
         offspring.append( off1 )
     else:
         offspring.append( off2 )
+
 
 assignFitness(offspring)
 print("offspring fitness:")
@@ -116,3 +211,18 @@ print("------------ fitness after mutation ------------")
 
 assignFitness(offspring)
 printFitness(offspring)
+
+print('----------------- 50 generations -----------------')
+# looping through to make 50 generations
+print("generation 1: \t" + str(printFitness(population)) )
+for i in range(G-1):
+    # create new generation
+    newGeneration(P, population)
+    # do crossover 
+    crossover(P, N, population)
+    # do mutation
+    mutation(P, N, population)
+    # work out fitness
+    assignFitness(population)
+    # print fitness
+    print("generation " + str(i + 2) + ": \t" + str(printFitness(population)))
