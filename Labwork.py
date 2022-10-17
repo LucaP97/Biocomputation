@@ -84,7 +84,7 @@ def newGeneration(popSize, population):
             population[i] = off1
         else:
             #offspring.append( off2 )
-            population[i] = off1
+            population[i] = off2
     return population
 
 # -------------------------- Crossover ----------------------------------------
@@ -107,8 +107,9 @@ def crossover(popSize, genes, population):
             toff1.gene[j] = toff2.gene[j]
             toff2.gene[j] = temp.gene[j]
         # assinging the offspring to the new values
-        population[i] = copy.deepcopy(toff1)
-        population[i+1] = copy.deepcopy(toff2)
+        if (test_function(population[i]) + test_function(population[i+1])) < (test_function(toff1) + test_function(toff2)):
+            population[i] = copy.deepcopy(toff1)
+            population[i+1] = copy.deepcopy(toff2)
     return population
 
 
@@ -132,8 +133,9 @@ def mutation(popSize, geneNum, population):
                 else:
                     gene = 1
             newind.gene.append(gene)
-        # overwrite offspring with the new mutated version
-        population[i] = copy.deepcopy(newind)
+        if test_function(population[i]) < test_function(newind):
+            # overwrite offspring with the new mutated version
+            population[i] = copy.deepcopy(newind)
         #append new individual or overwrite offspring.
     return population
 
