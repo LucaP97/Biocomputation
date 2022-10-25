@@ -3,7 +3,7 @@ import random, copy
 # class to create a node
 class individual:
     def __init__ (self):
-        self.gene = [0]*N
+        self.gene = [0.0, 1.0]*N
         self.fitness = 0
 
 
@@ -117,6 +117,28 @@ def crossover(popSize, genes, population):
 # -------------------------- Mutation ----------------------------------------
 
 
+# def mutation(popSize, geneNum, population):
+#     # loop through entire population
+#     for i in range( 0, popSize ):
+#         newind = individual()
+#         newind.gene = []
+#         # loop through every gene per node
+#         for j in range( 0, geneNum ):
+#             gene = population[i].gene[j]
+#             mutprob = random.random()
+#             # MUTRATE needs to be defined, as mutprob is variable
+#             if mutprob < MUTRATE:
+#                 if( gene == 1):
+#                     gene = 0
+#                 else:
+#                     gene = 1
+#             newind.gene.append(gene)
+#         if test_function(population[i]) < test_function(newind):
+#             # overwrite offspring with the new mutated version
+#             population[i] = copy.deepcopy(newind)
+#         #append new individual or overwrite offspring.
+#     return population
+
 def mutation(popSize, geneNum, population):
     # loop through entire population
     for i in range( 0, popSize ):
@@ -138,7 +160,6 @@ def mutation(popSize, geneNum, population):
             population[i] = copy.deepcopy(newind)
         #append new individual or overwrite offspring.
     return population
-
 
 
 assignFitness(population)
@@ -227,4 +248,4 @@ for i in range(G-1):
     # work out fitness
     assignFitness(population)
     # print fitness
-    print("generation " + str(i + 2) + ": \t" + str(printFitness(population)))
+    print("generation " + str(i + 2) + ":\n" + str(printFitness(population)))
