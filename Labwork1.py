@@ -1,10 +1,13 @@
 from audioop import cross
 import random, copy, matplotlib.pyplot as plt
+import numpy as np
 
 # class to create a node
 class individual:
     def __init__ (self):
-        self.gene = [0.0, 1.0]*N
+        # random.uniform returns a floating point rather than int
+        self.gene = random.uniform(MIN, MAX) * N
+        #self.gene = [0.0, 1.0]*N
         self.fitness = 0
 
 ############################################################
@@ -16,12 +19,21 @@ N = 10
 # population
 P = 50
 # generations
-G = 5000
+G = 50
+# min gene
+MIN = 0.0
+# max gene
+MAX = 1.0
 
 population = []
 offspring = []
 
-MUTRATE = 0.5
+MUTRATE = 0.1
+
+# lists to plot 
+popAverage = []
+popLowest = []
+popHighest = []
 
 ############################################################
 # initalise population
@@ -47,14 +59,14 @@ def test_function( ind ):
         utility = utility + ind.gene[i]
     return utility
 
-def assignIndFitness (population):
+def assignFitness (population):
     for i in population:
         i.fitness = test_function(i)
     return population
 
-def assignPopFitness (population):
+def popFitness (population):
     fitCount = 0
-    for i in P:
+    for i in population:
         fitCount += i.fitness
     return fitCount
 
@@ -114,6 +126,26 @@ def mutation (P, N, population):
     return population
 
 
+# fill plot lists
+
+def addPopAverage (P, population):
+    total = popFitness(population)
+    return total / P
+
+def addPopHighest (population):
+    curr = population[0].fitness
+    for i in population:
+        if (i.fitness > curr):
+            curr = i.fitness
+    return curr
+
+def addPopLowest (population):
+    curr = population[0].fitness
+    for i in population:
+        if (i.fitness < curr):
+            curr = i.fitness
+    return curr
+
 ############################################################
 # printing generations 
 ############################################################
@@ -124,8 +156,11 @@ def mutation (P, N, population):
 
 crossover(P, N, population)
 mutation(P, N, population)
-assignIndFitness(population)
-print("generation 1: " + str(printFitness(population)))
+assignFitness(population)
+popAverage.append(addPopAverage(P, population))
+popLowest.append(addPopLowest(population))
+popHighest.append(addPopHighest(population))
+print("generation 1: " + str(popFitness(population)))
 
 
 for i in range(G - 1):
@@ -133,6 +168,17 @@ for i in range(G - 1):
     crossover(P, N, population)
     mutation(P, N, population)
     assignFitness(population)
-    print("generation " + str(i + 2) + ": " + str(printFitness(population)))
+    popAverage.append(addPopAverage(P, population))
+    popLowest.append(addPopLowest(population))
+    popHighest.append(addPopHighest(population))
+    print("generation " + str(i + 2) + ": " + str(popFitness(population)))
 
+print(popAverage)
+print(popLowest)
+print(popHighest)
+
+
+plt.plot(np.array(popAverage))
+plt.plot(np.array(popLowest))
+plt.plot(np.array(popHighest))
 plt.show()
