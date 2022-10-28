@@ -80,7 +80,7 @@ def newGeneration(P, population):
         off1 = copy.deepcopy(population[parent1])
         parent2 = random.randint(0, P - 1)
         off2 = copy.deepcopy(population[parent2])
-        if off1.fitness > off2.fitness:
+        if off1.fitness < off2.fitness:
             population[i] = copy.deepcopy(off1)
         else:
             population[i] = copy.deepcopy(off2)
@@ -138,12 +138,12 @@ def mutation (P, N, population):
             if mutprob < MUTRATE:
                 alter = random.uniform(-MUTSTEP, MUTSTEP)
                 gene += alter
-                if gene > MAX:
+                if gene < MAX:
                     gene = MAX
-                if gene < MIN:
+                if gene > MIN:
                     gene = MIN
             newind.gene.append(gene)
-        if test_function(population[i]) < test_function(newind):
+        if test_function(population[i]) > test_function(newind):
             population[i] = copy.deepcopy(newind)
     return population
     #                 gene = 0
