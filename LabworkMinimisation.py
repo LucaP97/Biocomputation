@@ -1,6 +1,7 @@
 from audioop import cross
 import random, copy, matplotlib.pyplot as plt
 import numpy as np
+import math
 
 # class to create a node
 class individual:
@@ -8,14 +9,14 @@ class individual:
         # random.uniform returns a floating point rather than int
         self.gene = random.uniform(MIN, MAX) * N
         #self.gene = [0.0, 1.0]*N
-        self.fitness = 0
+        self.fitness = 0.0
 
 ############################################################
 # global variables 
 ############################################################
 
 # genes
-N = 10 
+N = 10
 # population
 P = 50
 # generations
@@ -55,10 +56,12 @@ for x in range (0, P):
 
 # fitness
 def test_function( ind ):
-    utility=0
+    utility = 0.0
     for i in range(N):
-        utility = utility + ind.gene[i]
+        utility += pow(ind.gene[i], 2) - (10 * math.cos( 2 * math.pi * (ind.gene[i])))
+    utility += 10*N
     return utility
+    
 
 def assignFitness (population):
     for i in population:
@@ -89,7 +92,7 @@ def newGeneration(P, population):
 
 # crossover
 
-def crossover (P, G, population):
+def crossover (P, N, population):
     toff1 = individual()
     toff2 = individual()
     temp = individual()
@@ -97,8 +100,8 @@ def crossover (P, G, population):
         toff1 = copy.deepcopy(population[i])
         toff2 = copy.deepcopy(population[i+1])
         temp = copy.deepcopy(population[i])
-        crosspoint = random.randint(1, G)
-        for j in range (crosspoint, G):
+        crosspoint = random.randint(1, N)
+        for j in range (crosspoint, N):
             toff1.gene[j] = toff2.gene[j]
             toff2.gene[j] = temp.gene[j]
         if ((test_function(population[i]) + test_function(population[i+1]))) < (test_function(toff1) + test_function(toff2)):
@@ -143,7 +146,7 @@ def mutation (P, N, population):
                 if gene > MIN:
                     gene = MIN
             newind.gene.append(gene)
-        if test_function(population[i]) > test_function(newind):
+        if test_function(population[i]) > float(test_function(newind)):
             population[i] = copy.deepcopy(newind)
     return population
     #                 gene = 0

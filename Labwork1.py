@@ -1,6 +1,7 @@
 from audioop import cross
 import random, copy, matplotlib.pyplot as plt
 import numpy as np
+import math
 
 # class to create a node
 class individual:
@@ -21,9 +22,9 @@ P = 50
 # generations
 G = 50
 # min gene
-MIN = 0.0
+MIN = -5.12
 # max gene
-MAX = 1.0
+MAX = 5.12
 
 population = []
 offspring = []
@@ -55,9 +56,10 @@ for x in range (0, P):
 
 # fitness
 def test_function( ind ):
-    utility=0
+    utility = 0.0
     for i in range(N):
-        utility = utility + ind.gene[i]
+        utility += pow(ind.gene[i], 2) - (10 * math.cos( 2 * math.pi * (ind.gene[i])))
+    utility += 10*N
     return utility
 
 def assignFitness (population):
@@ -80,7 +82,9 @@ def newGeneration(P, population):
         off1 = copy.deepcopy(population[parent1])
         parent2 = random.randint(0, P - 1)
         off2 = copy.deepcopy(population[parent2])
-        if off1.fitness > off2.fitness:
+        print(off1.gene)
+        print(off2.gene)
+        if test_function(off1) > test_function(off2.fitness):
             population[i] = copy.deepcopy(off1)
         else:
             population[i] = copy.deepcopy(off2)
@@ -146,13 +150,13 @@ def mutation (P, N, population):
         if test_function(population[i]) < test_function(newind):
             population[i] = copy.deepcopy(newind)
     return population
-    #                 gene = 0
-    #             else:
-    #                 gene = 1
-    #         newind.gene.append(gene)
-    #     if test_function(population[i]) < test_function(newind):
-    #         population[i] = copy.deepcopy(newind)
-    # return population
+
+
+# tournament selection
+
+
+def tournamentSelection(population):
+    return population
 
 
 # fill plot lists
