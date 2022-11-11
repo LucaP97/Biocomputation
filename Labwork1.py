@@ -8,7 +8,6 @@ class individual:
     def __init__ (self):
         # random.uniform returns a floating point rather than int
         self.gene = random.uniform(MIN, MAX) * N
-        #self.gene = [0.0, 1.0]*N
         self.fitness = 0
 
 ############################################################
@@ -82,13 +81,11 @@ def newGeneration(P, population):
         off1 = copy.deepcopy(population[parent1])
         parent2 = random.randint(0, P - 1)
         off2 = copy.deepcopy(population[parent2])
-        print(off1.gene)
-        print(off2.gene)
-        if test_function(off1) > test_function(off2.fitness):
-            population[i] = copy.deepcopy(off1)
+        if test_function(off1) > test_function(off2):
+            offspring.append(copy.deepcopy(off1))
         else:
-            population[i] = copy.deepcopy(off2)
-    return population
+            offspring.append(copy.deepcopy(off1))
+    return offspring
 
 
 # crossover
@@ -113,25 +110,6 @@ def crossover (P, G, population):
 
 # mutation
 
-# def mutation (P, N, population):
-#     for i in range( 0, P ):
-#         newind = individual()
-#         newind.gene = []
-#         for j in range ( 0, N ):
-#             gene = population[i].gene[j]
-#             mutprob = random.random()
-#             if mutprob < MUTRATE:
-#                 if (gene == 1):
-#                     gene = 0
-#                 else:
-#                     gene = 1
-#             newind.gene.append(gene)
-#         if test_function(population[i]) < test_function(newind):
-#             population[i] = copy.deepcopy(newind)
-#     return population
-
-# new mutation
-
 def mutation (P, N, population):
     for i in range( 0, P ):
         newind = individual()
@@ -152,11 +130,25 @@ def mutation (P, N, population):
     return population
 
 
+
 # tournament selection
 
+def eliteism(population, offspring):
+    popBest = population[0].fitness
+    offspringWorst = offspring[0].fitness
+    popBestIndex = 0
+    offspringWorstIndex = 0
+    for i in population:
+        if i.fitness > popBest:
+            popBest = i.fitness
+            popBestIndex = i
+    for i in offspring:
+        if i.fitness < offspringWorst:
+            offspringWorst = i.fitness
+            offspringWorstIndex = i
+    offspring[offspringWorstIndex] = copy.deepcopy(population[popBestIndex])
+    return offspring
 
-def tournamentSelection(population):
-    return population
 
 
 # fill plot lists
@@ -179,32 +171,52 @@ def addPopLowest (population):
             curr = i.fitness
     return curr
 
+
+############################################################
+# functions END
+############################################################
+
+
 ############################################################
 # printing generations 
 ############################################################
 
 # generation 1 is created sequentially, so we can print that first
-# test_function(population)
-# print("generation 1: " + printFitness(population))
 
-crossover(P, N, population)
-mutation(P, N, population)
 assignFitness(population)
 popAverage.append(addPopAverage(P, population))
 popLowest.append(addPopLowest(population))
-popHighest.append(addPopHighest(population))
+popHighest.append(addPopHighest(population)) 
 print("generation 1: " + str(popFitness(population)))
-
 
 for i in range(G - 1):
     newGeneration(P, population)
-    crossover(P, N, population)
-    mutation(P, N, population)
-    assignFitness(population)
-    popAverage.append(addPopAverage(P, population))
-    popLowest.append(addPopLowest(population))
-    popHighest.append(addPopHighest(population))
-    print("generation " + str(i + 2) + ": " + str(popFitness(population)))
+    crossover(P, G, offspring)
+    mutation(P, N, offspring)
+    assignFitness(offspring)
+    eliteism(population, offspring)
+    print("generation " + str(i + 2) + ": " + str(popFitness(offspring)))
+    population = offspring
+    offspring.clear()
+
+# crossover(P, N, population)
+# mutation(P, N, population)
+# assignFitness(population)
+# popAverage.append(addPopAverage(P, population))
+# popLowest.append(addPopLowest(population))
+# popHighest.append(addPopHighest(population))
+# print("generation 1: " + str(popFitness(population)))
+
+
+# for i in range(G - 1):
+#     newGeneration(P, population)
+#     crossover(P, N, population)
+#     mutation(P, N, population)
+#     assignFitness(population)
+#     popAverage.append(addPopAverage(P, population))
+#     popLowest.append(addPopLowest(population))
+#     popHighest.append(addPopHighest(population))
+#     print("generation " + str(i + 2) + ": " + str(popFitness(population)))
 
 # print(popAverage)
 # print(popLowest)
