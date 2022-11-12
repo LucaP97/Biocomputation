@@ -28,7 +28,7 @@ MAX = 5.12
 population = []
 offspring = []
 
-MUTRATE = 0.2
+MUTRATE = 0.05
 MUTSTEP = 0.4
 
 # lists to plot 
@@ -138,17 +138,16 @@ def eliteism(population, offspring):
     offspringWorst = offspring[0].fitness
     popBestIndex = 0
     offspringWorstIndex = 0
-    for i in population:
-        if i.fitness > popBest:
-            popBest = i.fitness
-            popBestIndex = i
-    for i in offspring:
-        if i.fitness < offspringWorst:
-            offspringWorst = i.fitness
-            offspringWorstIndex = i
+    for index, ind in enumerate(population):
+        if ind.fitness > popBest:
+            popBest = ind.fitness
+            popBestIndex = index
+    for index, ind in enumerate(offspring):
+        if ind.fitness < offspringWorst:
+            offspringWorst = ind.fitness
+            offspringWorstIndex = index
     offspring[offspringWorstIndex] = copy.deepcopy(population[popBestIndex])
     return offspring
-
 
 
 # fill plot lists
@@ -173,11 +172,6 @@ def addPopLowest (population):
 
 
 ############################################################
-# functions END
-############################################################
-
-
-############################################################
 # printing generations 
 ############################################################
 
@@ -187,41 +181,21 @@ assignFitness(population)
 popAverage.append(addPopAverage(P, population))
 popLowest.append(addPopLowest(population))
 popHighest.append(addPopHighest(population)) 
-print("generation 1: " + str(popFitness(population)))
+print("generation 1: " + str(popFitness(population) / P))
 
-for i in range(G - 1):
+for i in range (G - 1):
     newGeneration(P, population)
-    crossover(P, G, offspring)
+    crossover(P, N, offspring)
     mutation(P, N, offspring)
     assignFitness(offspring)
     eliteism(population, offspring)
-    print("generation " + str(i + 2) + ": " + str(popFitness(offspring)))
-    population = offspring
+    assignFitness(offspring)
+    print("Generation " + str(i + 2) + ": " + str(popFitness(offspring) / P))
+    popAverage.append(addPopAverage(P, offspring))
+    popLowest.append(addPopLowest(offspring))
+    popHighest.append(addPopHighest(offspring))
+    population = offspring.copy()
     offspring.clear()
-
-# crossover(P, N, population)
-# mutation(P, N, population)
-# assignFitness(population)
-# popAverage.append(addPopAverage(P, population))
-# popLowest.append(addPopLowest(population))
-# popHighest.append(addPopHighest(population))
-# print("generation 1: " + str(popFitness(population)))
-
-
-# for i in range(G - 1):
-#     newGeneration(P, population)
-#     crossover(P, N, population)
-#     mutation(P, N, population)
-#     assignFitness(population)
-#     popAverage.append(addPopAverage(P, population))
-#     popLowest.append(addPopLowest(population))
-#     popHighest.append(addPopHighest(population))
-#     print("generation " + str(i + 2) + ": " + str(popFitness(population)))
-
-# print(popAverage)
-# print(popLowest)
-# print(popHighest)
-
 
 plt.plot(np.array(popAverage))
 plt.plot(np.array(popLowest))
