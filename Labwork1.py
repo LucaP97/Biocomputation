@@ -19,7 +19,7 @@ N = 10
 # population
 P = 50
 # generations
-G = 200
+G = 50
 # min gene
 MIN = -5.12
 # max gene
@@ -28,7 +28,7 @@ MAX = 5.12
 population = []
 offspring = []
 
-MUTRATE = 0.05
+MUTRATE = 0.1
 MUTSTEP = 0.4
 
 # lists to plot 
@@ -90,32 +90,32 @@ def newGeneration(P, population):
 
 # crossover
 
-def crossover (P, G, population):
+def crossover (P, G, offspring):
     toff1 = individual()
     toff2 = individual()
     temp = individual()
     for i in range (0, P, 2):
-        toff1 = copy.deepcopy(population[i])
-        toff2 = copy.deepcopy(population[i+1])
-        temp = copy.deepcopy(population[i])
+        toff1 = copy.deepcopy(offspring[i])
+        toff2 = copy.deepcopy(offspring[i+1])
+        temp = copy.deepcopy(offspring[i])
         crosspoint = random.randint(1, G)
         for j in range (crosspoint, G):
             toff1.gene[j] = toff2.gene[j]
             toff2.gene[j] = temp.gene[j]
-        if ((test_function(population[i]) + test_function(population[i+1]))) < (test_function(toff1) + test_function(toff2)):
-            population[i] = copy.deepcopy(toff1)
-            population[i + 1] = copy.deepcopy(toff2)
-    return population
+        if ((test_function(offspring[i]) + test_function(offspring[i+1]))) < (test_function(toff1) + test_function(toff2)):
+            offspring[i] = copy.deepcopy(toff1)
+            offspring[i + 1] = copy.deepcopy(toff2)
+    return offspring
 
 
 # mutation
 
-def mutation (P, N, population):
+def mutation (P, N, offspring):
     for i in range( 0, P ):
         newind = individual()
         newind.gene = []
         for j in range ( 0, N ):
-            gene = population[i].gene[j]
+            gene = offspring[i].gene[j]
             mutprob = random.random()
             if mutprob < MUTRATE:
                 alter = random.uniform(-MUTSTEP, MUTSTEP)
@@ -125,9 +125,9 @@ def mutation (P, N, population):
                 if gene < MIN:
                     gene = MIN
             newind.gene.append(gene)
-        if test_function(population[i]) < test_function(newind):
-            population[i] = copy.deepcopy(newind)
-    return population
+        if test_function(offspring[i]) < test_function(newind):
+            offspring[i] = copy.deepcopy(newind)
+    return offspring
 
 
 

@@ -1,3 +1,7 @@
+#####################################################
+# TODO: removed assignfitness & popfitness, remove function in code and use loop (overly abstracted)
+#####################################################
+
 from audioop import cross
 import random, copy, matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +19,7 @@ class individual:
 ############################################################
 
 # genes
-N = 10 
+N = 10
 # population
 P = 50
 # generations
@@ -28,8 +32,8 @@ MAX = 5.12
 population = []
 offspring = []
 
-MUTRATE = 0.05
-MUTSTEP = 0.4
+MUTRATE = 0.1
+MUTSTEP = 0.1
 
 # lists to plot 
 popAverage = []
@@ -57,20 +61,11 @@ for x in range (0, P):
 def test_function( ind ):
     utility = 0.0
     for i in range(N):
-        utility += pow(ind.gene[i], 2) - (10 * math.cos( 2 * math.pi * (ind.gene[i])))
+        #utility += pow(ind.gene[i], 2) - (10 * math.cos( 2 * math.pi * (ind.gene[i])))
+        utility += pow(ind.gene[i], 2)
+        utility -= (10 * math.cos( 2 * math.pi * (ind.gene[i])))
     utility += 10*N
     return utility
-
-def assignFitness (population):
-    for i in population:
-        i.fitness = test_function(i)
-    return population
-
-def popFitness (population):
-    fitCount = 0
-    for i in population:
-        fitCount += i.fitness
-    return fitCount
 
 
 # new generation 
@@ -81,7 +76,7 @@ def newGeneration(P, population):
         off1 = copy.deepcopy(population[parent1])
         parent2 = random.randint(0, P - 1)
         off2 = copy.deepcopy(population[parent2])
-        if test_function(off1) < test_function(off2):
+        if off1.fitness < off2.fitness:
             offspring.append(copy.deepcopy(off1))
         else:
             offspring.append(copy.deepcopy(off1))
@@ -90,44 +85,44 @@ def newGeneration(P, population):
 
 # crossover
 
-def crossover (P, G, population):
+def crossover (P, G, offspring):
     toff1 = individual()
     toff2 = individual()
     temp = individual()
     for i in range (0, P, 2):
-        toff1 = copy.deepcopy(population[i])
-        toff2 = copy.deepcopy(population[i+1])
-        temp = copy.deepcopy(population[i])
-        crosspoint = random.randint(1, G)
-        for j in range (crosspoint, G):
+        toff1 = copy.deepcopy(offspring[i])
+        toff2 = copy.deepcopy(offspring[i+1])
+        temp = copy.deepcopy(offspring[i])
+        crosspoint = random.randint(1, N)
+        for j in range (crosspoint, N):
             toff1.gene[j] = toff2.gene[j]
             toff2.gene[j] = temp.gene[j]
-        if ((test_function(population[i]) + test_function(population[i+1]))) < (test_function(toff1) + test_function(toff2)):
-            population[i] = copy.deepcopy(toff1)
-            population[i + 1] = copy.deepcopy(toff2)
-    return population
+        #if ((test_function(offspring[i]) + test_function(offspring[i+1]))) > (test_function(toff1) + test_function(toff2)):
+        offspring[i] = copy.deepcopy(toff1)
+        offspring[i + 1] = copy.deepcopy(toff2)
+    return offspring
 
 
 # mutation
 
-def mutation (P, N, population):
+def mutation (P, N, offspring):
     for i in range( 0, P ):
         newind = individual()
         newind.gene = []
         for j in range ( 0, N ):
-            gene = population[i].gene[j]
+            gene = offspring[i].gene[j]
             mutprob = random.random()
-            if mutprob > MUTRATE:
+            if mutprob < MUTRATE:
                 alter = random.uniform(-MUTSTEP, MUTSTEP)
                 gene += alter
-                if gene < MAX:
+                if gene > MAX:
                     gene = MAX
-                if gene > MIN:
+                if gene < MIN:
                     gene = MIN
             newind.gene.append(gene)
-        if test_function(population[i]) > test_function(newind):
-            population[i] = copy.deepcopy(newind)
-    return population
+        #if test_function(offspring[i]) > test_function(newind):
+        offspring[i] = copy.deepcopy(newind)
+    return offspring
 
 
 
@@ -153,20 +148,22 @@ def eliteism(population, offspring):
 # fill plot lists
 
 def addPopAverage (P, population):
-    total = popFitness(population)
+    total = 0
+    for i in range(len(population)):
+        total += population[i].fitness
     return total / P
 
 def addPopHighest (population):
     curr = population[0].fitness
     for i in population:
-        if (i.fitness < curr):
+        if (i.fitness > curr):
             curr = i.fitness
     return curr
 
 def addPopLowest (population):
     curr = population[0].fitness
     for i in population:
-        if (i.fitness > curr):
+        if (i.fitness < curr):
             curr = i.fitness
     return curr
 
@@ -177,20 +174,24 @@ def addPopLowest (population):
 
 # generation 1 is created sequentially, so we can print that first
 
-assignFitness(population)
+#assignFitness(population)
+for i in range(len(population)):
+    population[i].fitness = test_function(population[i])
 popAverage.append(addPopAverage(P, population))
 popLowest.append(addPopLowest(population))
 popHighest.append(addPopHighest(population)) 
-print("generation 1: " + str(popFitness(population) / P))
+print("generation 1: " + str(addPopAverage(P, population)))
 
-for i in range (G - 1):
+for i in range (P):
     newGeneration(P, population)
     crossover(P, N, offspring)
     mutation(P, N, offspring)
-    assignFitness(offspring)
+    for j in range(len(offspring)):
+        offspring[j].fitness = test_function(offspring[j])
     eliteism(population, offspring)
-    assignFitness(offspring)
-    print("Generation " + str(i + 2) + ": " + str(popFitness(offspring) / P))
+    for j in range(len(offspring)):
+        offspring[j].fitness = test_function(offspring[j])
+    print("Generation " + str(i + 2) + ": " + str(addPopAverage(P, offspring)))
     popAverage.append(addPopAverage(P, offspring))
     popLowest.append(addPopLowest(offspring))
     popHighest.append(addPopHighest(offspring))
