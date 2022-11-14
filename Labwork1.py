@@ -19,7 +19,7 @@ N = 10
 # population
 P = 50
 # generations
-G = 50
+G = 200
 # min gene
 MIN = -5.12
 # max gene
@@ -43,7 +43,7 @@ popHighest = []
 for x in range (0, P):
     tempgene=[]
     for y in range (0, N):
-        tempgene.append( random.randint(0,1))
+        tempgene.append( random.uniform(MIN, MAX))
     newind = individual()
     newind.gene = tempgene.copy()
     population.append(newind)
