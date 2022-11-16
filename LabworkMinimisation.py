@@ -23,7 +23,7 @@ N = 10
 # population
 P = 50
 # generations
-G = 50
+G = 300
 # min gene
 MIN = -5.12
 # max gene
@@ -32,7 +32,7 @@ MAX = 5.12
 population = []
 offspring = []
 
-MUTRATE = 0.1
+MUTRATE = 0.05
 MUTSTEP = 0.1
 
 # lists to plot 
@@ -182,7 +182,7 @@ popLowest.append(addPopLowest(population))
 popHighest.append(addPopHighest(population)) 
 print("generation 1: " + str(addPopAverage(P, population)))
 
-for i in range (P):
+for i in range (G - 1):
     newGeneration(P, population)
     crossover(P, N, offspring)
     mutation(P, N, offspring)
