@@ -1,3 +1,6 @@
+import math
+import LabworkMinimisation
+
 with open('data1.txt') as f:
     lines = f.read()
 
@@ -5,14 +8,35 @@ with open('data1.txt') as f:
 
 class network:
     def __init__(self):
-        self.hweight = None
-        self.oweight = None
+        self.hweight = hidNODES, inpNODES + 1
+        self.oweight = outNODES, hidNODES + 1
         self.error = 0
 
 inputNodes = 6
 hiddenNodes = 6
+inpNODES = []
+hidNODES = []
+outNODES = []
+hidNodesOutput = []
+inpNodesOutput = []
 
-linesCut = lines.split(' ')
+DATASIZE = len(lines.split(' '))
 
-for i in range(0,7):
-    print(i)
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+
+# fitness function is used to populate the weights for the network
+# once done, input values are passed through hidden layer, then outputs are fed to output layer until output is found
+# this output is then compared with associated input
+
+def fitness(ind):
+    for t in range(DATASIZE):
+        for i in range(hidNODES)
+
+
+# def sigmoid(node):
+
+
+# linesCut = lines.split(' ')
+
+# for i in range(0,7)

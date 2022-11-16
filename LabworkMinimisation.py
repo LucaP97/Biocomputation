@@ -58,14 +58,14 @@ for x in range (0, P):
 
 
 # fitness
-def test_function( ind ):
-    utility = 0.0
-    for i in range(N):
-        #utility += pow(ind.gene[i], 2) - (10 * math.cos( 2 * math.pi * (ind.gene[i])))
-        utility += pow(ind.gene[i], 2)
-        utility -= (10 * math.cos( 2 * math.pi * (ind.gene[i])))
-    utility += 10*N
-    return utility
+# def test_function( ind ):
+#     utility = 0.0
+#     for i in range(N):
+#         utility += pow(ind.gene[i], 2) - (10 * math.cos( 2 * math.pi * (ind.gene[i])))
+#         #utility += pow(ind.gene[i], 2)
+#         #utility -= (10 * math.cos( 2 * math.pi * (ind.gene[i])))
+#     utility += 10*N
+#     return utility
 
 
 # new generation 
@@ -79,7 +79,7 @@ def newGeneration(P, population):
         if off1.fitness < off2.fitness:
             offspring.append(copy.deepcopy(off1))
         else:
-            offspring.append(copy.deepcopy(off1))
+            offspring.append(copy.deepcopy(off2))
     return offspring
 
 
