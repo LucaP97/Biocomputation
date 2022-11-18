@@ -1,5 +1,6 @@
 import math
 import LabworkMinimisation
+import numpy as np
 
 with open('data1.txt') as f:
     lines = f.read()
@@ -29,9 +30,9 @@ def sigmoid(x):
 # once done, input values are passed through hidden layer, then outputs are fed to output layer until output is found
 # this output is then compared with associated input
 
-def fitness(ind):
-    for t in range(DATASIZE):
-        for i in range(hidNODES)
+# def fitness(ind):
+#     for t in range(DATASIZE):
+#         for i in range(hidNODES)
 
 
 # def sigmoid(node):
