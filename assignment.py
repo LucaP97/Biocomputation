@@ -131,34 +131,36 @@ initalisePopulation()
 #     utility += 10*N
 #     return utility
 
-# def test_function(ind):
-#     # for every line in data
-#     for t in range(DATASIZE):
-#         # for every hidden node
-#         for i in range():
-#             # initalise hidden node
-#             hidNodeOut[i] = 0
-#             # for every input node
-#             for j in range(inpNODES):
-#                 # calculate hidden node output for every input node
-#                 # ind.hweight[i][j] -> hidden node weight from input node j to hidden node i
-#                 hidNodeOut[i] += (ind.hweight[i][j] * data[t][j])
-#             # bias added
-#             hidNodeOut[i] += ind.hweight[i][inpNODES]
-#             # sigmoid function
-#             hidNodeOut[i] = np.sigmoid(hidNodeOut[i])
-#         for i in range(outNODES):
-#             outNODES[i] = 0
-#             for j in range(hidNODES):
-#                 outNODES[i] += (ind.oweight[i][j] * hidNodeOut[j])
-#             outNODES[i] += ind.oweight[i][hidNODES]
-#             outNODES[i] = np.sigmoid(inpNodeOut[i])
-#         if expectedOutput[t] == 1.0 and outNODES[0] < 0.5:
-#             error += 1.0
-#         if expectedOutput[t] == 0.0 and outNODES[t] >= 0.5:
-#             error += 1.0
+def test_function(ind):
+    # for every line in data
+    for t in range(DATASIZE):
+        # for every hidden node
+        for i in range(hidNodesNum):
+            # initalise hidden node
+            hidNodeOut[i] = 0
+            # for every input node
+            for j in range(inpNodesNum):
+                # calculate hidden node output for every input node
+                # ind.hweight[i][j] -> hidden node weight from input node j to hidden node i
+                hidNodeOut[i] += (ind.hweight[i][j] * data[t][j])
+            # bias added
+            hidNodeOut[i] += ind.hweight[i][inpNODES]
+            # sigmoid function
+            hidNodeOut[i] = np.sigmoid(hidNodeOut[i])
+        for i in range(outNodesnum):
+            outNODES[i] = 0
+            for j in range(hidNODES):
+                outNODES[i] += (ind.oweight[i][j] * hidNodeOut[j])
+            outNODES[i] += ind.oweight[i][hidNODES]
+            outNODES[i] = np.sigmoid(inpNodeOut[i])
+        if expectedOutput[t] == 1.0 and outNODES[0] < 0.5:
+            error += 1.0
+        if expectedOutput[t] == 0.0 and outNODES[t] >= 0.5:
+            error += 1.0
 
-
+for i in range(len(population)):
+    test_function(population[i])
+    print(population[i].error)
 
 # new generation 
 
