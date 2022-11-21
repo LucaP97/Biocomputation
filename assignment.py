@@ -60,6 +60,7 @@ hidNODES = []
 hidNodeOut = []
 outNODES = []
 
+data = []
 expectedOutput = []
 
 # node quantity
@@ -67,35 +68,55 @@ inpNodesNum = 6
 hidNodesNum = 3
 outNodesnum = 1
 
+def importData(file):
+    with open(file, 'r') as f:
+        lines = f.readlines()
+        for i in lines:
+            currLine = i.split()
+            for j in range(len(currLine)):
+                currLine[j] = float(currLine[j])
+                if currLine[j] == float(0) or currLine[j] == float(1):
+                    expectedOutput.append(int(currLine[j]))
+                    currLine.remove(currLine[j])
+            data.append(currLine)
+    return len(data)
+
+
 # DATASIZE will be the value of the return of the imported file
-DATASIZE = len(lines.split(' '))
-print("datasize: " + str(DATASIZE))
+DATASIZE = importData("data1.txt")
 
-# data lists
-data = []
-expectedOutput = []
-
+print(data)
+print(expectedOutput)
 
 ############################################################
 # initalise population
 ############################################################
 
-for x in range (0, P):
-    temphweight = [[]]
-    tempoweight = [[]]
-    for y in range (0, hidNODES):
-        for x in range(inpNODES):
-            temphweight.append( random.uniform(MIN, MAX))
+def initalisePopulation():
+    for x in range (DATASIZE):
+        temphweight = [[]]
+        tempoweight = [[]]
+        for y in range (hidNodesNum):
+            for x in range(inpNodesNum):
+                temphweight.append( random.uniform(MIN, MAX))
+        for y in range(hidNodesNum):
+            for x in range(outNodesnum):
+                tempoweight.append(random.uniform(MIN, MAX))
+        #newind = individual()
+        newind = network()
+        # *** not sure if this should be commented out?
+        #newind.gene = tempgene.copy()
+        newind.hweight = temphweight.copy()
+        newind.oweight = tempoweight.copy()
+        population.append(newind)
+    return population
 
-    for y in range(hidNODES):
-        for x in range(outNODES):
-            tempoweight.append(random.uniform(MIN, MAX))
-    #newind = individual()
-    newind = network()
-    # *** not sure if this should be commented out?
-    #newind.gene = tempgene.copy()
-    population.append(newind)
+initalisePopulation()
 
+# print("here:" + str(len(population)))
+# for i in range(len(population)):
+#     for j in range(len(population[i].hweight)):
+#         print("node: " + str(i) + " hweight: "+ str(j) + str(population[i].hweight[j]))
 ############################################################
 # functions 
 ############################################################
@@ -103,12 +124,40 @@ for x in range (0, P):
 # ---- GA ----
 
 # fitness
-def test_function( ind ):
-    utility = 0.0
-    for i in range(N):
-        utility += pow(ind.gene[i], 2) - (10 * math.cos( 2 * math.pi * (ind.gene[i])))
-    utility += 10*N
-    return utility
+# def test_function( ind ):
+#     utility = 0.0
+#     for i in range(N):
+#         utility += pow(ind.gene[i], 2) - (10 * math.cos( 2 * math.pi * (ind.gene[i])))
+#     utility += 10*N
+#     return utility
+
+# def test_function(ind):
+#     # for every line in data
+#     for t in range(DATASIZE):
+#         # for every hidden node
+#         for i in range():
+#             # initalise hidden node
+#             hidNodeOut[i] = 0
+#             # for every input node
+#             for j in range(inpNODES):
+#                 # calculate hidden node output for every input node
+#                 # ind.hweight[i][j] -> hidden node weight from input node j to hidden node i
+#                 hidNodeOut[i] += (ind.hweight[i][j] * data[t][j])
+#             # bias added
+#             hidNodeOut[i] += ind.hweight[i][inpNODES]
+#             # sigmoid function
+#             hidNodeOut[i] = np.sigmoid(hidNodeOut[i])
+#         for i in range(outNODES):
+#             outNODES[i] = 0
+#             for j in range(hidNODES):
+#                 outNODES[i] += (ind.oweight[i][j] * hidNodeOut[j])
+#             outNODES[i] += ind.oweight[i][hidNODES]
+#             outNODES[i] = np.sigmoid(inpNodeOut[i])
+#         if expectedOutput[t] == 1.0 and outNODES[0] < 0.5:
+#             error += 1.0
+#         if expectedOutput[t] == 0.0 and outNODES[t] >= 0.5:
+#             error += 1.0
+
 
 
 # new generation 
@@ -214,52 +263,12 @@ def addPopLowest (population):
 # ---- NN ----
 
 
-def importData(file):
-    with open(file, 'r') as f:
-        lines = f.readlines()
-        for i in lines:
-            currLine = i.split()
-            for j in range(len(currLine)):
-                currLine[j] = float(currLine[j])
-            data.append(currLine)
-            for j in range(len(currLine)):
-                if currLine[j] == 1 or currLine[j] == 0:
-                    expectedOutput.append(int(currLine[j]))
-    return(len(lines))
-
-
-def fitness(ind):
-    # for every line in data
-    for t in range(DATASIZE):
-        # for every hidden node
-        for i in range(hidNODES):
-            # initalise hidden node
-            hidNodeOut[i] = 0
-            # for every input node
-            for j in range(inpNODES):
-                # calculate hidden node output for every input node
-                # ind.hweight[i][j] -> hidden node weight from input node j to hidden node i
-                hidNodeOut[i] += (ind.hweight[i][j] * data[t][j])
-            # bias added
-            hidNodeOut[i] += ind.hweight[i][inpNODES]
-            # sigmoid function
-            hidNodeOut[i] = np.sigmoid(hidNodeOut[i])
-        for i in range(outNODES):
-            inpNodeOut[i] = 0
-            for j in range(hidNODES):
-                inpNodeOut[i] += (ind.oweight[i][j] * hidNodeOut[j])
-            inpNodeOut[i] += ind.oweight[i][hidNODES]
-            inpNodeOut[i] = np.sigmoid(inpNodeOut[i])
-        if expectedOutput[t] == 1.0 and inpNodeOut[0] < 0.5:
-            error += 1.0
-        if expectedOutput[t] == 0.0 and inpNodeOut[t] >= 0.5:
-            error += 1.0
-
-
 
 ############################################################
 # printing generations 
 ############################################################
+
+
 
 # generation 1 is created sequentially, so we can print that first
 
