@@ -174,9 +174,9 @@ def test_function(ind):
 
 def newGeneration():
     for i in range(len(population)):
-        parent1 = random.randint(0, DATASIZE)
+        parent1 = random.randint(0, P - 1)
         off1 = copy.deepcopy(population[parent1])
-        parent2 = random.randint(0, population[-1])
+        parent2 = random.randint(0, P - 1)
         off2 = copy.deepcopy(parent2)
         if off1.error < off2.error:
             offspring.append(off1)
