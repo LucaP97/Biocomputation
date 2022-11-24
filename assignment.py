@@ -88,7 +88,7 @@ DATASIZE = importData("data1.txt")
 ############################################################
 
 def initalisePopulation():
-    for x in range (DATASIZE):
+    for x in range (P):
         temphweight = [[] for y in range(hidNodesNum)]
         tempoweight = [[] for y in range(outNodesnum)]
         for y in range (hidNodesNum):
@@ -129,6 +129,7 @@ def initalisePopulation():
 
 # fitness
 def test_function(ind):
+    ind.error = 0
     # for every line in data
     for t in range(DATASIZE):
         # for every hidden node
@@ -177,7 +178,7 @@ def newGeneration():
         parent1 = random.randint(0, P - 1)
         off1 = copy.deepcopy(population[parent1])
         parent2 = random.randint(0, P - 1)
-        off2 = copy.deepcopy(parent2)
+        off2 = copy.deepcopy(population[parent2])
         if off1.error < off2.error:
             offspring.append(off1)
         else:
@@ -206,24 +207,56 @@ def newGeneration():
 
 # mutation
 
-def mutation (P, N, offspring):
-    for i in range( 0, P ):
-        newind = individual()
-        newind.gene = []
-        for j in range ( 0, N ):
-            gene = offspring[i].gene[j]
-            mutprob = random.random()
-            if mutprob < MUTRATE:
-                alter = random.uniform(-MUTSTEP, MUTSTEP)
-                gene += alter
-                if gene > MAX:
-                    gene = MAX
-                if gene < MIN:
-                    gene = MIN
-            newind.gene.append(gene)
-        #if test_function(offspring[i]) > test_function(newind):
-        offspring[i] = copy.deepcopy(newind)
-    return offspring
+# def mutation (P, N, offspring):
+#     for i in range( 0, P ):
+#         newind = individual()
+#         newind.gene = []
+#         for j in range ( 0, N ):
+#             gene = offspring[i].gene[j]
+#             mutprob = random.random()
+#             if mutprob < MUTRATE:
+#                 alter = random.uniform(-MUTSTEP, MUTSTEP)
+#                 gene += alter
+#                 if gene > MAX:
+#                     gene = MAX
+#                 if gene < MIN:
+#                     gene = MIN
+#             newind.gene.append(gene)
+#         #if test_function(offspring[i]) > test_function(newind):
+#         offspring[i] = copy.deepcopy(newind)
+#     return offspring
+
+def mutation (population):
+    for i in range(0, P):
+        newind = network()
+        newind.hweight = [[0 for i in range(inpNodesNum+1)] for j in hidNODES]
+        newind.oweight = [[0 for i in range(hidNodesNum+1)] for j in outNODES]
+        for j in range(0, hidNodesNum):
+            for x in range(len(hidNODES)):
+                hweight = population[i].hweight[j][x]
+                mutprob = random.random()
+                if mutprob < MUTRATE:
+                    alter = random.uniform(-MUTSTEP, MUTSTEP)
+                    hweight += alter
+                    if hweight > MAX:
+                        hweight = MAX
+                    if hweight < MIN:
+                        hweight = MIN
+            newind.hweight.append(hweight)
+        for j in range(0, outNodesnum):
+            for x in range(len(outNODES)):
+                oweight = population[i].oweight[j][x]
+                mutprob = random.random()
+                if mutprob < MUTRATE:
+                    alter = random.uniform(-MUTSTEP, MUTSTEP)
+                    oweight += alter
+                    if oweight > MAX:
+                        oweight = MAX
+                    if oweight < MIN:
+                        oweight = MIN
+            newind.oweight.append(oweight)
+        population[i] = copy.deepcopy(newind)
+
 
 # def mutation():
 #     for i in range(len(population)):
@@ -322,13 +355,45 @@ for i in range(len(population)):
 popAverage.append(addPopAverage(population))
 popLowest.append(addPopWorst(population))
 popHighest.append(addPopBest(population))
-newGeneration()
-eliteism()
-for i in range(len(offspring)):
-    test_function(offspring[i])
-popAverage.append(addPopAverage(offspring))
-popLowest.append(addPopWorst(offspring))
-popHighest.append(addPopBest(offspring))
+for i in range(G - 1):
+    newGeneration()
+    mutation(offspring)
+    for j in range(len(population)):
+        test_function(population[j])
+    eliteism()
+    for j in range(len(population)):
+        test_function(population[j])
+    popAverage.append(addPopAverage(population))
+    popLowest.append(addPopWorst(population))
+    popHighest.append(addPopBest(population))
+    population = offspring.copy()
+    offspring.clear()
+
+
+# initalisePopulation()
+# for i in range(len(population)):
+#     test_function(population[i])
+# popAverage.append(addPopAverage(population))
+# popLowest.append(addPopWorst(population))
+# popHighest.append(addPopBest(population))
+# newGeneration()
+# mutation(offspring)
+# eliteism()
+# for i in range(len(offspring)):
+#     test_function(offspring[i])
+# popAverage.append(addPopAverage(offspring))
+# popLowest.append(addPopWorst(offspring))
+# popHighest.append(addPopBest(offspring))
+# print("highest: " + str(popHighest))
+# print("average: " + str(popAverage))
+# print("lowest: " + str(popLowest))
+# print(len(population))
+# eliteism()
+# for i in range(len(offspring)):
+#     test_function(offspring[i])
+# popAverage.append(addPopAverage(offspring))
+# popLowest.append(addPopWorst(offspring))
+# popHighest.append(addPopBest(offspring))
 
 
 
