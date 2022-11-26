@@ -84,10 +84,7 @@ def initalisePopulation():
         for y in range(outNodesnum):
             for x in range(hidNodesNum):
                 tempoweight[y].append(random.uniform(MIN, MAX))
-        #newind = individual()
         newind = network()
-        # *** not sure if this should be commented out?
-        #newind.gene = tempgene.copy()
         newind.hweight = temphweight.copy()
         newind.oweight = tempoweight.copy()
         population.append(newind)
@@ -165,6 +162,7 @@ def mutation (population):
                         oweight = MIN
             newind.oweight.append(oweight)
         population[i] = copy.deepcopy(newind)
+    return population
 
 # eliteism
 def eliteism():
@@ -207,29 +205,41 @@ def addPopWorst(population):
 
 DATASIZE = importData("data1.txt")
 
-initalisePopulation()
-for i in range(P):
-    test_function(population[i])
-popAverage.append(addPopAverage(population))
-popBest.append(addPopBest(population))
-popWorst.append(addPopWorst(population))
-print("generation 1: Average:" + str(addPopAverage(population)) + " Best:" + str(addPopBest(population)) + " Worst:" + str(addPopWorst(population)))
-for i in range(G - 1):
-    newGeneration()
-    mutation(offspring)
-    for j in range(P):
-        test_function(offspring[j])
-    eliteism()
-    for j in range(P):
-        test_function(offspring[j])
-    popAverage.append(addPopAverage(offspring))
-    popBest.append(addPopBest(offspring))
-    popWorst.append(addPopWorst(offspring))
-    print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Best:" + str(addPopBest(offspring)) + " Worst:" + str(addPopWorst(offspring)))
-    population = offspring.copy()
-    offspring.clear()
+# initalisePopulation()
+# for i in range(P):
+#     test_function(population[i])
+# popAverage.append(addPopAverage(population))
+# popBest.append(addPopBest(population))
+# popWorst.append(addPopWorst(population))
+# print("generation 1: Average:" + str(addPopAverage(population)) + " Best:" + str(addPopBest(population)) + " Worst:" + str(addPopWorst(population)))
+# for i in range(G - 1):
+#     newGeneration()
+#     offspring = mutation(offspring)
+#     for j in range(P):
+#         test_function(offspring[j])
+#     eliteism()
+#     for j in range(P):
+#         test_function(offspring[j])
+#     popAverage.append(addPopAverage(offspring))
+#     popBest.append(addPopBest(offspring))
+#     popWorst.append(addPopWorst(offspring))
+#     print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Best:" + str(addPopBest(offspring)) + " Worst:" + str(addPopWorst(offspring)))
+#     population = offspring.copy()
+#     offspring.clear()
 
-plt.plot(np.array(popAverage))
-plt.plot(np.array(popWorst))
-plt.plot(np.array(popBest))
-plt.show()
+# plt.plot(np.array(popAverage))
+# plt.plot(np.array(popWorst))
+# plt.plot(np.array(popBest))
+# plt.show()
+
+# debugging
+
+initalisePopulation()
+# for every member in population
+for p in range(P):
+    print("member " + str(p+1) + ":\nHidden Nodes:")
+    # for every array in hidden node
+    print(str(population[p].hweight))
+    # for h in range(len(population[p].hweight)):
+    #     for i in range(hidNodesNum):
+    #         print(population[p].hweight[h][i])
