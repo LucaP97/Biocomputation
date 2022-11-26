@@ -5,6 +5,8 @@ import math
 # class to create network
 class network:
     def __init__(self):
+        # this seems to be wrong
+        # 
         self.hweight = [[0 for i in range(inpNodesNum+1)] for j in hidNODES]
         self.oweight = [[0 for i in range(hidNodesNum+1)] for j in outNODES]
         self.error = 0
@@ -77,13 +79,16 @@ def importData(file):
 def initalisePopulation():
     for x in range (P):
         temphweight = [[] for y in range(hidNodesNum)]
+        # temphweight = [[0 for i in range(inpNodesNum+1)] for j in hidNODES]
         tempoweight = [[] for y in range(outNodesnum)]
         for y in range (hidNodesNum):
             for x in range(inpNodesNum):
                 temphweight[y].append( random.uniform(MIN, MAX))
+            temphweight[y].append(1)
         for y in range(outNodesnum):
             for x in range(hidNodesNum):
                 tempoweight[y].append(random.uniform(MIN, MAX))
+            tempoweight[y].append(1)
         newind = network()
         newind.hweight = temphweight.copy()
         newind.oweight = tempoweight.copy()
@@ -135,8 +140,8 @@ def newGeneration():
 def mutation (population):
     for i in range(0, P):
         newind = network()
-        newind.hweight = [[0 for i in range(inpNodesNum+1)] for j in hidNODES]
-        newind.oweight = [[0 for i in range(hidNodesNum+1)] for j in outNODES]
+        newind.hweight = [[] for y in range(hidNodesNum)]
+        newind.oweight = [[] for y in range(outNodesnum)]
         for j in range(0, hidNodesNum):
             for x in range(len(hidNODES)):
                 hweight = population[i].hweight[j][x]
@@ -162,7 +167,6 @@ def mutation (population):
                         oweight = MIN
             newind.oweight.append(oweight)
         population[i] = copy.deepcopy(newind)
-    return population
 
 # eliteism
 def eliteism():
@@ -212,9 +216,14 @@ DATASIZE = importData("data1.txt")
 # popBest.append(addPopBest(population))
 # popWorst.append(addPopWorst(population))
 # print("generation 1: Average:" + str(addPopAverage(population)) + " Best:" + str(addPopBest(population)) + " Worst:" + str(addPopWorst(population)))
+# # for i in range(P):
+# #     print("hidden weights:")
+# #     print(str(population[i].hweight))
+# #     print("output weights:")
+# #     print(str(population[i].oweight))
 # for i in range(G - 1):
 #     newGeneration()
-#     offspring = mutation(offspring)
+#     mutation(offspring)
 #     for j in range(P):
 #         test_function(offspring[j])
 #     eliteism()
@@ -224,6 +233,11 @@ DATASIZE = importData("data1.txt")
 #     popBest.append(addPopBest(offspring))
 #     popWorst.append(addPopWorst(offspring))
 #     print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Best:" + str(addPopBest(offspring)) + " Worst:" + str(addPopWorst(offspring)))
+#     # for i in range(P):
+#     #     print("hidden weights:")
+#     #     print(str(offspring[i].hweight))
+#     #     print("output weights:")
+#     #     print(str(offspring[i].oweight))
 #     population = offspring.copy()
 #     offspring.clear()
 
@@ -235,11 +249,8 @@ DATASIZE = importData("data1.txt")
 # debugging
 
 initalisePopulation()
-# for every member in population
-for p in range(P):
-    print("member " + str(p+1) + ":\nHidden Nodes:")
-    # for every array in hidden node
-    print(str(population[p].hweight))
-    # for h in range(len(population[p].hweight)):
-    #     for i in range(hidNodesNum):
-    #         print(population[p].hweight[h][i])
+for i in range(P):
+    print("Gen " + str(i+1) + "\n")
+    print(str(population[i].hweight))
+    print(str(population[i].oweight))
+
