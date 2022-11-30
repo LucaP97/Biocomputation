@@ -24,6 +24,7 @@ MAX = 5.12
 
 population = []
 offspring = []
+bestInd = []
 
 MUTRATE = 0.4
 MUTSTEP = 1.5
@@ -45,8 +46,15 @@ hidNODES = [0 for _ in range(hidNodesNum)]
 hidNodeOut = [0 for _ in range(hidNodesNum)]
 outNODES = [0]
 
-data = []
-expectedOutput = []
+# classification data
+trainingData = []
+validationData = []
+
+# expected output
+trainingExpectedOutput = []
+validationExpectedOutput = []
+
+
 
 ############################################################
 # functions 
@@ -60,15 +68,25 @@ def sigmoid(x):
 def importData(file):
     with open(file, 'r') as f:
         lines = f.readlines()
-        for i in lines:
-            currLine = i.split()
+        trainingSize = math.ceil((len(lines) / 3) * 2)
+        validationSize = math.floor(len(lines) / 3)
+        for i in range(0, trainingSize):
+            currLine = lines[i].split()
             for j in range(len(currLine)):
                 currLine[j] = float(currLine[j])
                 if currLine[j] == float(0) or currLine[j] == float(1):
-                    expectedOutput.append(int(currLine[j]))
+                    trainingExpectedOutput.append(int(currLine[j]))
                     currLine.remove(currLine[j])
-            data.append(currLine)
-    return len(data), len(currLine)
+            trainingData.append(currLine)
+        for i in range(trainingSize, len(lines)):
+            currLine = lines[i].split()
+            for j in range(len(currLine)):
+                currLine[j] = float(currLine[j])
+                if currLine[j] == float(0) or currLine[j] == float(1):
+                    validationExpectedOutput.append(int(currLine[j]))
+                    currLine.remove(currLine[j])
+            validationData.append(currLine)
+    return trainingSize + validationSize, len(currLine), trainingSize, validationSize
 
 # initalises the population
 def initalisePopulation():
@@ -91,10 +109,10 @@ def initalisePopulation():
     return population
 
 # fitness
-def test_function(ind):
+def test_function(ind, data, expectedOutput):
     ind.error = 0
     # for every line in data
-    for t in range(DATASIZE):
+    for t in range(len(data)):
         # for every hidden node
         for i in range(hidNodesNum):
             # initalise hidden node
@@ -183,52 +201,100 @@ def addPopAverage(population):
     total = 0
     for i in range(len(population)):
         total += population[i].error
-    return total / len(population)
+    return ((total / len(population)) / DATASIZE) * 100
 
 def addPopHighest(population):
     curr = population[0].error
     for i in population:
         if i.error > curr:
             curr = i.error
-    return curr
+    return (curr / DATASIZE) * 100
 
 def addPopLowest(population):
     curr = population[0].error
     for i in range(0, P):
         if population[i].error < curr:
             curr = population[i].error
-    return curr
+    return (curr / DATASIZE) * 100
+
+
+# add best ind from training to go through validation data
+# def addValidationInd(population):
+#     curr = population[0].error
+#     for i in range(0, P):
+#         if population[i].error < curr:
+#             curr = population[i].error
+#     return (curr / DATASIZE) * 100
+
+# store best individual from training data
+def addBestInd(population):
+    currError = population[0].error
+    currInd = population[0]
+    for index, ind in enumerate(population):
+        if ind.error < currError:
+            currError = ind.error
+            currInd = population[index]
+    return currInd
+            
+
 
 
 ############################################################
 # printing generations 
 ############################################################
 
-DATASIZE, inpNodesNum = importData("data3.txt")
+DATASIZE, inpNodesNum, trainingSize, validationSize = importData("data1.txt")
+
 
 initalisePopulation()
 for i in range(P):
-    test_function(population[i])
-popLowest.append(addPopLowest(population))
-popAverage.append(addPopAverage(population))
-popHighest.append(addPopHighest(population))
+    test_function(population[i], trainingData, trainingExpectedOutput)
+popLowest.append(population)
+popAverage.append(population)
 print("generation 1: Average:" + str(addPopAverage(population)) + " Highest:" + str(addPopHighest(population)) + " Lowest:" + str(addPopLowest(population)))
 for i in range(G - 1):
     newGeneration()
     mutation(offspring)
     for j in range(P):
-        test_function(offspring[j])
+        test_function(offspring[j], trainingData, trainingExpectedOutput)
     eliteism()
     for j in range(P):
-        test_function(offspring[j])
+        test_function(offspring[j], trainingData, trainingExpectedOutput)
     popAverage.append(addPopAverage(offspring))
-    popHighest.append(addPopHighest(offspring))
-    popLowest.append(addPopLowest(offspring))
+    popLowest.append(addPopLowest)
     print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Highest:" + str(addPopHighest(offspring)) + " Lowest:" + str(addPopLowest(offspring)))
     population = offspring.copy()
     offspring.clear()
+print("\nTraining complete\n")
+bestInd.append(addBestInd(population))
+print(len(bestInd))
+print(bestInd[0].error)
+# for i in range(G):
 
-plt.plot(np.array(popAverage))
-plt.plot(np.array(popLowest))
-plt.plot(np.array(popHighest))
-plt.show()
+
+# initalisePopulation()
+# for i in range(P):
+#     test_function(population[i])
+# popLowest.append(addPopLowest(population))
+# popAverage.append(addPopAverage(population))
+# popHighest.append(addPopHighest(population))
+# print("generation 1: Average:" + str(addPopAverage(population)) + " Highest:" + str(addPopHighest(population)) + " Lowest:" + str(addPopLowest(population)))
+# for i in range(G - 1):
+#     newGeneration()
+#     mutation(offspring)
+#     for j in range(P):
+#         test_function(offspring[j])
+#     eliteism()
+#     for j in range(P):
+#         test_function(offspring[j])
+#     popAverage.append(addPopAverage(offspring))
+#     popHighest.append(addPopHighest(offspring))
+#     popLowest.append(addPopLowest(offspring))
+#     print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Highest:" + str(addPopHighest(offspring)) + " Lowest:" + str(addPopLowest(offspring)))
+#     population = offspring.copy()
+#     offspring.clear()
+
+# plt.plot(np.array(popAverage))
+# plt.plot(np.array(popLowest))
+# plt.plot(np.array(popHighest))
+# plt.show()
