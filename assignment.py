@@ -25,16 +25,16 @@ MAX = 5.12
 population = []
 offspring = []
 
-MUTRATE = 0.1
-MUTSTEP = 0.4
+MUTRATE = 0.4
+MUTSTEP = 1.5
 
 # lists to plot 
 popAverage = []
-popBest = []
-popWorst = []
+popHighest = []
+popLowest = []
 
-# node quantity
-inpNodesNum = 6
+# node quantity, inpNodeNum to be overwritten by importData()
+inpNodesNum = 0
 hidNodesNum = 3
 outNodesnum = 1
 
@@ -68,10 +68,7 @@ def importData(file):
                     expectedOutput.append(int(currLine[j]))
                     currLine.remove(currLine[j])
             data.append(currLine)
-    return len(data)
-
-# *** needs to be moved to final loop ***
-# DATASIZE = importData("data1.txt")
+    return len(data), len(currLine)
 
 # initalises the population
 def initalisePopulation():
@@ -134,43 +131,6 @@ def newGeneration():
         else:
             offspring.append(off2)
 
-# mutation
-# def mutation (population):
-#     for i in range(0, P):
-#         newind = network()
-#         newind.hweight = [[] for y in range(hidNodesNum)]
-#         newind.oweight = [[] for y in range(outNodesnum)]
-#         for j in range(0, hidNodesNum):
-#             for x in range(len(hidNODES)):
-#                 hweight = population[i].hweight[j][x]
-#                 mutprob = random.random()
-#                 if mutprob < MUTRATE:
-#                     alter = random.uniform(-MUTSTEP, MUTSTEP)
-#                     hweight += alter
-#                     if hweight > MAX:
-#                         hweight = MAX
-#                     if hweight < MIN:
-#                         hweight = MIN
-#             newind.hweight.append(hweight)
-#         for j in range(0, outNodesnum):
-#             for x in range(len(outNODES)):
-#                 oweight = population[i].oweight[j][x]
-#                 mutprob = random.random()
-#                 if mutprob < MUTRATE:
-#                     alter = random.uniform(-MUTSTEP, MUTSTEP)
-#                     oweight += alter
-#                     if oweight > MAX:
-#                         oweight = MAX
-#                     if oweight < MIN:
-#                         oweight = MIN
-#             newind.oweight.append(oweight)
-#         population[i] = copy.deepcopy(newind)
-
-# for p in range(P):
-#     for i in range(len(population[p].hweight)):
-#         for j in range(len(population[p].hweight[i])-1):
-#             print(population[p].hweight[i][j])
-
 # generation 50 gets initialised incorrectly
 def mutation(population):
     for p in range(0, P):
@@ -225,80 +185,50 @@ def addPopAverage(population):
         total += population[i].error
     return total / len(population)
 
-def addPopBest(population):
+def addPopHighest(population):
     curr = population[0].error
     for i in population:
         if i.error > curr:
             curr = i.error
     return curr
 
-def addPopWorst(population):
+def addPopLowest(population):
     curr = population[0].error
-    for i in population:
-        if i.error < curr:
-            curr = i.error
+    for i in range(0, P):
+        if population[i].error < curr:
+            curr = population[i].error
     return curr
+
 
 ############################################################
 # printing generations 
 ############################################################
 
-DATASIZE = importData("data1.txt")
+DATASIZE, inpNodesNum = importData("data3.txt")
 
 initalisePopulation()
-for i in range(P - 1):
+for i in range(P):
     test_function(population[i])
+popLowest.append(addPopLowest(population))
 popAverage.append(addPopAverage(population))
-popBest.append(addPopBest(population))
-popWorst.append(addPopWorst(population))
-print("generation 1: Average:" + str(addPopAverage(population)) + " Best:" + str(addPopBest(population)) + " Worst:" + str(addPopWorst(population)))
+popHighest.append(addPopHighest(population))
+print("generation 1: Average:" + str(addPopAverage(population)) + " Highest:" + str(addPopHighest(population)) + " Lowest:" + str(addPopLowest(population)))
 for i in range(G - 1):
     newGeneration()
     mutation(offspring)
-    for p in range(P):
-        print(offspring[p].hweight)
-    for j in range(P - 1):
+    for j in range(P):
         test_function(offspring[j])
     eliteism()
     for j in range(P):
         test_function(offspring[j])
     popAverage.append(addPopAverage(offspring))
-    popBest.append(addPopBest(offspring))
-    popWorst.append(addPopWorst(offspring))
-    print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Best:" + str(addPopBest(offspring)) + " Worst:" + str(addPopWorst(offspring)))
-    # for i in range(P):
-    #     print("hidden weights:")
-    #     print(str(offspring[i].hweight))
-    #     print("output weights:")
-    #     print(str(offspring[i].oweight))
+    popHighest.append(addPopHighest(offspring))
+    popLowest.append(addPopLowest(offspring))
+    print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Highest:" + str(addPopHighest(offspring)) + " Lowest:" + str(addPopLowest(offspring)))
     population = offspring.copy()
     offspring.clear()
 
 plt.plot(np.array(popAverage))
-plt.plot(np.array(popWorst))
-plt.plot(np.array(popBest))
+plt.plot(np.array(popLowest))
+plt.plot(np.array(popHighest))
 plt.show()
-
-# debugging
-
-# initalisePopulation()
-# newGeneration()
-# mutation(offspring)
-#mutation(offspring)
-#hweight = [[000000][0000000][0000000]]
-
-# initalisePopulation()
-# mutation(population)
-# for i in range(P):
-#     print("hweight")
-#     print(str(population[i].hweight))
-#     print("oweight")
-#     print(str(population[i].oweight))
-
-
-# for going into the 2d array
-# for p in range(P):
-#     for i in range(len(population[p].hweight)):
-#         for j in range(len(population[p].hweight[i])-1):
-#             print(population[p].hweight[i][j])
-
