@@ -86,7 +86,7 @@ def importData(file):
                     validationExpectedOutput.append(int(currLine[j]))
                     currLine.remove(currLine[j])
             validationData.append(currLine)
-    return trainingSize + validationSize, len(currLine), trainingSize, validationSize
+    return int(trainingSize + validationSize), len(currLine), trainingSize, validationSize
 
 # initalises the population
 def initalisePopulation():
@@ -215,6 +215,7 @@ def addPopLowest(population):
     for i in range(0, P):
         if population[i].error < curr:
             curr = population[i].error
+    print(float(curr) / float(DATASIZE) * 100)
     return (curr / DATASIZE) * 100
 
 
@@ -251,7 +252,7 @@ for i in range(P):
     test_function(population[i], trainingData, trainingExpectedOutput)
 popLowest.append(population)
 popAverage.append(population)
-print("generation 1: Average:" + str(addPopAverage(population)) + " Highest:" + str(addPopHighest(population)) + " Lowest:" + str(addPopLowest(population)))
+print("generation 1: Average:" + str(addPopAverage(population)) + " Lowest:" + str(addPopLowest(population)))
 for i in range(G - 1):
     newGeneration()
     mutation(offspring)
@@ -262,13 +263,13 @@ for i in range(G - 1):
         test_function(offspring[j], trainingData, trainingExpectedOutput)
     popAverage.append(addPopAverage(offspring))
     popLowest.append(addPopLowest)
-    print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Highest:" + str(addPopHighest(offspring)) + " Lowest:" + str(addPopLowest(offspring)))
+    print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Lowest:" + str(addPopLowest(offspring)))
     population = offspring.copy()
     offspring.clear()
 print("\nTraining complete\n")
 bestInd.append(addBestInd(population))
-print(len(bestInd))
-print(bestInd[0].error)
+# print(len(bestInd))
+# print(bestInd[0].error)
 # for i in range(G):
 
 
@@ -294,7 +295,10 @@ print(bestInd[0].error)
 #     population = offspring.copy()
 #     offspring.clear()
 
+print(popAverage)
+print(popLowest)
+
 # plt.plot(np.array(popAverage))
 # plt.plot(np.array(popLowest))
 # plt.plot(np.array(popHighest))
-# plt.show()
+plt.show()
