@@ -14,9 +14,9 @@ class network:
 ############################################################
 
 # population
-P = 50
+P = 150
 # generations
-G = 150
+G = 300
 # min gene
 MIN = -5.12
 # max gene
@@ -39,7 +39,7 @@ validationPopLowest = []
 
 # node quantity, inpNodeNum to be overwritten by importData()
 inpNodesNum = 0
-hidNodesNum = 3
+hidNodesNum = 0
 outNodesnum = 1
 
 # node lists
@@ -100,11 +100,11 @@ def initalisePopulation():
         for y in range (hidNodesNum):
             for x in range(inpNodesNum):
                 temphweight[y].append( random.uniform(MIN, MAX))
-            temphweight[y].append(random.uniform(-1, 1))
+            temphweight[y].append(random.uniform(-1, 1)) # better results when i make this 1
         for y in range(outNodesnum):
             for x in range(hidNodesNum):
                 tempoweight[y].append(random.uniform(MIN, MAX))
-            tempoweight[y].append(random.uniform(-1, 1))
+            tempoweight[y].append(random.uniform(-1, 1)) # better results when i make this 1
         newind = network()
         newind.hweight = temphweight.copy()
         newind.oweight = tempoweight.copy()
@@ -246,7 +246,9 @@ def addBestInd(population):
 # printing generations 
 ############################################################
 
-DATASIZE, inpNodesNum, trainingSize, validationSize = importData("data3.txt")
+DATASIZE, inpNodesNum, trainingSize, validationSize = importData("data1.txt")
+
+hidNodesNum = math.floor(inpNodesNum / 3)
 
 # training
 initalisePopulation()
