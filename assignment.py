@@ -14,9 +14,9 @@ class network:
 ############################################################
 
 # population
-P = 150
+P = 50
 # generations
-G = 300
+G = 150
 # min gene
 MIN = -5.12
 # max gene
@@ -36,18 +36,19 @@ trainingPopLowest = []
 validationPopAverage = []
 validationPopHighest = []
 validationPopLowest = []
+bestIndPlot = []
 
 # node quantity, inpNodeNum to be overwritten by importData()
 inpNodesNum = 0
 hidNodesNum = 0
 outNodesnum = 1
 
-# node lists
-inpNODES = [0 for _ in range(inpNodesNum)]
-inpNodeOut = [0 for _ in range(inpNodesNum)]
-hidNODES = [0 for _ in range(hidNodesNum)]
-hidNodeOut = [0 for _ in range(hidNodesNum)]
-outNODES = [0]
+# # node lists
+# inpNODES = [0 for _ in range(inpNodesNum)]
+# inpNodeOut = [0 for _ in range(inpNodesNum)]
+# hidNODES = [0 for _ in range(hidNodesNum)]
+# hidNodeOut = [0 for _ in range(hidNodesNum)]
+# outNODES = [0]
 
 # classification data
 trainingData = []
@@ -99,7 +100,7 @@ def initalisePopulation():
         tempoweight = [[] for y in range(outNodesnum)]
         for y in range (hidNodesNum):
             for x in range(inpNodesNum):
-                temphweight[y].append( random.uniform(MIN, MAX))
+                temphweight[y].append(random.uniform(MIN, MAX))
             temphweight[y].append(random.uniform(-1, 1)) # better results when i make this 1
         for y in range(outNodesnum):
             for x in range(hidNodesNum):
@@ -126,14 +127,14 @@ def test_function(ind, data, expectedOutput):
                 # ind.hweight[i][j] -> hidden node weight from input node j to hidden node i
                 hidNodeOut[i] += (ind.hweight[i][j] * data[t][j])
             # bias added
-            hidNodeOut[i] += ind.hweight[i][-1]
+            hidNodeOut[i] += ind.hweight[i][-1] # could consider making -1 as InpNodesNum
             # sigmoid function
             hidNodeOut[i] = sigmoid(hidNodeOut[i])
         for i in range(outNodesnum):
             outNODES[i] = 0
             for j in range(hidNodesNum):
                 outNODES[i] += (ind.oweight[i][j] * hidNodeOut[j])
-            outNODES[i] += ind.oweight[i][-1]
+            outNODES[i] += ind.oweight[i][-1] # could consider making -1 as hidNodesNum
             outNODES[i] = sigmoid(outNODES[i])
         if expectedOutput[t] == 1.0 and outNODES[0] < 0.5:
             ind.error += 1.0
@@ -183,7 +184,7 @@ def mutation(population):
                         oweight = MIN
                 #newind.oweight.append(oweight)
                 newind.oweight[i].append(oweight)
-    population[p] = copy.deepcopy(newind)
+        population[p] = copy.deepcopy(newind)
 
 # eliteism
 def eliteism():
@@ -246,9 +247,18 @@ def addBestInd(population):
 # printing generations 
 ############################################################
 
-DATASIZE, inpNodesNum, trainingSize, validationSize = importData("data1.txt")
+DATASIZE, inpNodesNum, trainingSize, validationSize = importData("data2.txt")
 
-hidNodesNum = math.floor(inpNodesNum / 3)
+hidNodesNum = int(math.floor(inpNodesNum / 3))
+
+# node lists
+inpNODES = [0 for _ in range(inpNodesNum)]
+inpNodeOut = [0 for _ in range(inpNodesNum)]
+hidNODES = [0 for _ in range(hidNodesNum)]
+hidNodeOut = [0 for _ in range(hidNodesNum)]
+outNODES = [0]
+
+#hidNodesNum = 3 #math.floor(inpNodesNum / 3)
 
 # training
 initalisePopulation()
@@ -270,44 +280,51 @@ for i in range(G - 1):
     trainingPopLowest.append((addPopLowest(offspring) / trainingSize) * 100)
     trainingPopHighest.append((addPopHighest(offspring) / trainingSize) * 100)
     print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Lowest:" + str(addPopLowest(offspring)))
+    bestInd.append(addBestInd(offspring))
+    for j in range(len(bestInd)):
+        test_function(bestInd[j], validationData, validationExpectedOutput)
+    bestIndPlot.append((bestInd[0].error / validationSize) * 100)
     population = offspring.copy()
     offspring.clear()
+    bestInd.clear()
 print("\nTraining complete\n")
 
 # validation set 
-for i in range(P):
-    test_function(population[i], validationData, validationExpectedOutput)
-validationPopLowest.append((addPopLowest(population) / validationSize) * 100)
-validationPopAverage.append((addPopAverage(population) / validationSize) * 100)
-validationPopHighest.append((addPopHighest(population) / validationSize) * 100)
-print("generation 1: Average:" + str(addPopAverage(population)) + " Lowest:" + str(addPopLowest(population)))
-for i in range(G - 1):
-    newGeneration()
-    mutation(offspring)
-    for j in range(P):
-        test_function(offspring[j], validationData, validationExpectedOutput)
-    eliteism()
-    for j in range(P):
-        test_function(offspring[j], validationData, validationExpectedOutput)
-    validationPopAverage.append((addPopAverage(offspring) / validationSize) * 100)
-    validationPopLowest.append((addPopLowest(offspring) / validationSize) * 100)
-    validationPopHighest.append((addPopHighest(offspring) / validationSize) * 100)
-    print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Lowest:" + str(addPopLowest(offspring)))
-    population = offspring.copy()
-    offspring.clear()
+# for i in range(P):
+#     test_function(population[i], validationData, validationExpectedOutput)
+# validationPopLowest.append((addPopLowest(population) / validationSize) * 100)
+# validationPopAverage.append((addPopAverage(population) / validationSize) * 100)
+# validationPopHighest.append((addPopHighest(population) / validationSize) * 100)
+# print("generation 1: Average:" + str(addPopAverage(population)) + " Lowest:" + str(addPopLowest(population)))
+# for i in range(G - 1):
+#     newGeneration()
+#     mutation(offspring)
+#     for j in range(P):
+#         test_function(offspring[j], validationData, validationExpectedOutput)
+#     eliteism()
+#     for j in range(P):
+#         test_function(offspring[j], validationData, validationExpectedOutput)
+#     validationPopAverage.append((addPopAverage(offspring) / validationSize) * 100)
+#     validationPopLowest.append((addPopLowest(offspring) / validationSize) * 100)
+#     validationPopHighest.append((addPopHighest(offspring) / validationSize) * 100)
+#     print("generation " + str(i + 2) + ": Average:" + str(addPopAverage(offspring)) + " Lowest:" + str(addPopLowest(offspring)))
+#     population = offspring.copy()
+#     offspring.clear()
 
 
 # graphs
 
-plt.plot(np.array(trainingPopAverage))#, label="training average"))
-plt.plot(np.array(trainingPopLowest))#, label="training lowest"))
-plt.plot(np.array(trainingPopHighest))
-plt.plot(np.array(validationPopAverage))#, label="validation average"))
-plt.plot(np.array(validationPopLowest))#, label="validation lowest"))
-plt.plot(np.array(validationPopHighest))
+plt.plot(np.array(trainingPopAverage), label="training average")#, label="training average"))
+plt.plot(np.array(trainingPopLowest), label="training lowest")#, label="training lowest"))
+# plt.plot(np.array(trainingPopHighest))
+# plt.plot(np.array(validationPopAverage))#, label="validation average"))
+# plt.plot(np.array(validationPopLowest))#, label="validation lowest"))
+# plt.plot(np.array(validationPopHighest))
 # # plt.plot(np.array(popHighest))
+plt.plot(np.array(bestIndPlot), label="best ind")
 
 plt.xlabel("Generations")
 plt.ylabel("Error")
+plt.legend()
 
 plt.show()

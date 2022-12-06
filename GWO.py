@@ -5,8 +5,6 @@ import sys     # max float
  
  
 #-------fitness functions---------
- 
-# this function provides the search space
 
 # rastrigin function
 def fitness_rastrigin(position):
@@ -15,8 +13,6 @@ def fitness_rastrigin(position):
     xi = position[i]
     fitness_value += (xi * xi) - (10 * math.cos(2 * math.pi * xi)) + 10
   return fitness_value
- 
-# this is the test function
 
 #sphere function
 def fitness_sphere(position):
