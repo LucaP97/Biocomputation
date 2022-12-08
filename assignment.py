@@ -26,8 +26,8 @@ population = []
 offspring = []
 bestInd = []
 
-MUTRATE = 0.4
-MUTSTEP = 1.5
+MUTRATE = 0.3
+MUTSTEP = 0.8
 
 # lists to plot 
 trainingPopAverage = []
