@@ -155,8 +155,8 @@ y = np.array(expectedOutput)
 
 model = Sequential()
 model.add(Dense(8, input_shape = (8,), activation='sigmoid',))
-model.add(Dense(5, activation='sigmoid'))
-model.add(Dense(4, activation='sigmoid'))
+model.add(Dense(6, activation='sigmoid'))
+#model.add(Dense(4, activation='sigmoid'))
 model.add(Dense(1, activation='sigmoid'))
 
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -168,10 +168,10 @@ returnData = model.evaluate(x, y, return_dict=True)
 for k, v in returnData.items():
     print(k, v)
 
-metrics = model.get_metrics_result()
+# metrics = model.get_metrics_result()
 
-for k, v in metrics.items():
-    print(k, v)
+# for k, v in metrics.items():
+#     print(k, v)
 
 
 # plt.plot(history.history['acc'])
